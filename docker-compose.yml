@@ -1,0 +1,48 @@
+services:
+  # MongoDB Service
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+  # Backend Service
+  backend:
+    build:
+      context: ./backend
+      target: ${BUILD_TARGET:-development}
+    container_name: backend
+    ports:
+      - '${BACKEND_PORT}:5000'
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/${MONGO_DB_NAME}?authSource=admin
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      target: ${BUILD_TARGET:-development}
+    container_name: frontend
+    ports:
+      - '${FRONTEND_PORT}:5173'
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  mongo-data:
