@@ -2,7 +2,7 @@ services:
   # MongoDB Service
   mongodb:
     image: mongo:latest
-    container_name: mongodb
+    container_name: ${APP_NAME:-mern-app}-mongodb
     ports:
       - '27017:27017'
     volumes:
@@ -16,9 +16,9 @@ services:
     build:
       context: ./backend
       target: ${BUILD_TARGET:-development}
-    container_name: backend
+    container_name: ${APP_NAME:-mern-app}-backend
     ports:
-      - '${BACKEND_PORT}:5000'
+      - '${BACKEND_PORT:-5000}:5000'
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/${MONGO_DB_NAME}?authSource=admin
@@ -33,9 +33,9 @@ services:
     build:
       context: ./frontend
       target: ${BUILD_TARGET:-development}
-    container_name: frontend
+    container_name: ${APP_NAME:-mern-app}-frontend
     ports:
-      - '${FRONTEND_PORT}:5173'
+      - '${FRONTEND_PORT:-5173}:5173'
     environment:
       NODE_ENV: ${NODE_ENV:-development}
     depends_on:
