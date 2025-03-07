@@ -2,21 +2,20 @@ services:
   # MongoDB Service
   mongodb:
     image: mongo:latest
-    container_name: ${APP_NAME:-mern-app}-mongodb
+    container_name: ${APP_NAME:-app}-mongodb
     ports:
       - '27017:27017'
     volumes:
       - mongo-data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-root}
   # Backend Service
   backend:
     build:
       context: ./backend
       target: ${BUILD_TARGET:-development}
-    container_name: ${APP_NAME:-mern-app}-backend
+    container_name: ${APP_NAME:-app}-backend
     ports:
       - '${BACKEND_PORT:-5000}:5000'
     environment:
@@ -33,7 +32,7 @@ services:
     build:
       context: ./frontend
       target: ${BUILD_TARGET:-development}
-    container_name: ${APP_NAME:-mern-app}-frontend
+    container_name: ${APP_NAME:-app}-frontend
     ports:
       - '${FRONTEND_PORT:-5173}:5173'
     environment:
